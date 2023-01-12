@@ -66,7 +66,7 @@ public class LocacaoServiceTeste {
 	public void testeLocacao() throws Exception {
 		// Cenario
 		Usuario usuario = new Usuario("Patrick");
-		List<Filme> filmes = Arrays.asList(new Filme("Harry Potter", 0, 5.0));
+		List<Filme> filmes = Arrays.asList(new Filme("Harry Potter",0, 5.0));
 
 		// Acão
 		Locacao locacao = service.alugarFilme(usuario, filmes);
