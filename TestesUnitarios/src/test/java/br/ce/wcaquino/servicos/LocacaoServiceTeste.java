@@ -2,9 +2,7 @@ package br.ce.wcaquino.servicos;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -36,7 +34,7 @@ public class LocacaoServiceTeste {
 
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
-	
+
 	private static int contador = 0;
 
 	@Before
@@ -51,7 +49,7 @@ public class LocacaoServiceTeste {
 	public void tearDown() {
 		System.out.println("After");
 	}
-	
+
 	@BeforeClass
 	public static void setupClass() {
 		System.out.println("Before");
@@ -63,10 +61,10 @@ public class LocacaoServiceTeste {
 	}
 
 	@Test
-	public void testeLocacao() throws Exception {
+	public void deveAlugarFilme() throws Exception {
 		// Cenario
 		Usuario usuario = new Usuario("Patrick");
-		List<Filme> filmes = Arrays.asList(new Filme("Harry Potter",0, 5.0));
+		List<Filme> filmes = Arrays.asList(new Filme("Harry Potter", 2, 5.0));
 
 		// Acão
 		Locacao locacao = service.alugarFilme(usuario, filmes);
@@ -77,7 +75,7 @@ public class LocacaoServiceTeste {
 		error.checkThat(locacao.getValor(), is(equalTo(5.0)));
 		error.checkThat(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
 		error.checkThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)),
-				is(false));
+				is(true));
 
 		// assertThat(locacao.getValor(), is(equalTo(5.0)));
 		// assertThat(locacao.getValor(), is(not(6.0)));
@@ -91,7 +89,7 @@ public class LocacaoServiceTeste {
 
 	@Test(expected = FilmeSemEstoqueException.class) // Deve ser usado somente se o codigo retornar um unico tipo de
 														// excecão esperada.
-	public void testAlocacao_FilmeSemEstoque() throws Exception {
+	public void naoDeveAlugarFilmeSemEstoque() throws Exception {
 		// Cenario
 		Usuario usuario = new Usuario("Patrick");
 		List<Filme> filmes = Arrays.asList(new Filme("Harry Potter", 0, 5.0));
@@ -102,12 +100,11 @@ public class LocacaoServiceTeste {
 	}
 
 	@Test
-	public void testAlocacao_UsuarioVazio() throws FilmeSemEstoqueException {
+	public void naoDeveAlugarFilmeSemUsuario() throws FilmeSemEstoqueException {
 		// Usuario usuario = new Usuario("Patrick");
-		List<Filme> filmes = Arrays.asList(new Filme("Harry Potter", 0, 5.0));
+		List<Filme> filmes = Arrays.asList(new Filme("Harry Potter", 2, 5.0));
 
 		// Acão
-
 		try {
 			service.alugarFilme(null, filmes);
 			fail(); // Lançando erro manualmente, para evitar falso positivo
@@ -119,7 +116,7 @@ public class LocacaoServiceTeste {
 	}
 
 	@Test()
-	public void testAlocacao_FilmeVazio() throws Exception {
+	public void naoDeveAlugarFilmeSemFilme() throws Exception {
 		// Cenario
 		Usuario usuario = new Usuario("Patrick");
 		// Filme filme = new Filme("Harry Potter", 0, 5.0);
@@ -131,6 +128,36 @@ public class LocacaoServiceTeste {
 		service.alugarFilme(usuario, null);
 
 		System.out.println("Forma nova");
+
+	}
+
+	@Test
+	public void devePagar75PctNoFilme3() throws LocadoraException, FilmeSemEstoqueException {
+		// cenario
+		Usuario usuario = new Usuario();
+		List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 2, 4.0), new Filme("Filme 2", 2, 4.0),
+				new Filme("Filme 3", 2, 4.0));
+
+		// acao
+		Locacao resultado = service.alugarFilme(usuario, filmes);
+
+		// verificao
+		assertThat(resultado.getValor(), is(11.0));
+
+	}
+
+	@Test
+	public void devePagar50PctNoFilme4() throws LocadoraException, FilmeSemEstoqueException {
+		// cenario
+		Usuario usuario = new Usuario();
+		List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 2, 4.0), new Filme("Filme 2", 2, 4.0),
+				new Filme("Filme 3", 2, 4.0), new Filme("Filme 3", 2, 4.0));
+
+		// acao
+		Locacao resultado = service.alugarFilme(usuario, filmes);
+
+		// verificao
+		assertThat(resultado.getValor(), is(13.0));
 
 	}
 }
