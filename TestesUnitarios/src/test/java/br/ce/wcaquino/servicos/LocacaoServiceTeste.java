@@ -2,16 +2,22 @@ package br.ce.wcaquino.servicos;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
@@ -62,6 +68,8 @@ public class LocacaoServiceTeste {
 
 	@Test
 	public void deveAlugarFilme() throws Exception {
+		Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
+		
 		// Cenario
 		Usuario usuario = new Usuario("Patrick");
 		List<Filme> filmes = Arrays.asList(new Filme("Harry Potter", 2, 5.0));
@@ -178,7 +186,9 @@ public class LocacaoServiceTeste {
 	
 	
 	@Test
+	//@Ignore
 	public void devePagar0PctNoFilme6() throws LocadoraException, FilmeSemEstoqueException {
+			
 		// cenario
 		Usuario usuario = new Usuario();
 		List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 2, 4.0), new Filme("Filme 2", 2, 4.0),
@@ -191,4 +201,21 @@ public class LocacaoServiceTeste {
 		assertThat(resultado.getValor(), is(14.0));
 
 	}
+	
+	@Test
+	public void deveDevolverNaSegundaAoAlugarSabado() throws LocadoraException, FilmeSemEstoqueException {
+		Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
+		
+		//Cenario
+		Usuario usuario = new Usuario("Usuario 1");		
+		List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 2, 4.0)); 
+		
+		// acao
+		Locacao resultado = service.alugarFilme(usuario, filmes);
+		
+		// verificao
+	    boolean ehSegunda =	DataUtils.verificarDiaSemana(resultado.getDataRetorno(), Calendar.MONDAY);
+		assertTrue(ehSegunda);
+	}
+	
 }
