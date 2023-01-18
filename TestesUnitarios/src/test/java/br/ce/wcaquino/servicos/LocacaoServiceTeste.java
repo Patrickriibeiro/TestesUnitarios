@@ -28,6 +28,7 @@ import br.ce.wcaquino.entidades.Usuario;
 import br.ce.wcaquino.exception.FilmeSemEstoqueException;
 import br.ce.wcaquino.exception.LocadoraException;
 import br.ce.wcaquino.utils.DataUtils;
+import static br.ce.wcaquino.matchers.MatchersProprios.*;
 
 public class LocacaoServiceTeste {
 
@@ -150,8 +151,12 @@ public class LocacaoServiceTeste {
 		Locacao resultado = service.alugarFilme(usuario, filmes);
 		
 		// verificao
-	    boolean ehSegunda =	DataUtils.verificarDiaSemana(resultado.getDataRetorno(), Calendar.MONDAY);
-		assertTrue(ehSegunda);
+		assertThat(resultado.getDataRetorno(), caiEm(Calendar.MONDAY));
+		//assertThat(resultado.getDataRetorno(), new DiaSemanaMatcher(Calendar.MONDAY));
+	    //boolean ehSegunda = DataUtils.verificarDiaSemana(resultado.getDataRetorno(), Calendar.MONDAY);
+		//assertTrue(ehSegunda);
+		// assertThat(retorno.getDataRetorno(),caiEm(Calendar.MONDAY));
+		// assertThat(retorno.getDataRetorno(),caiNumaSegunda());
 	}
 	
 }
