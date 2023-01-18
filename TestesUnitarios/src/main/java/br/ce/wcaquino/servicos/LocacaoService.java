@@ -44,13 +44,13 @@ public class LocacaoService {
 			
 			switch(i) {
 			
-			case 2 : valorFilme = valorFilme * 0.75;
+			case 2 : valorFilme = valorFilme * 0.75; break;
 			
-			case 3 : valorFilme = valorFilme * 0.5;
+			case 3 : valorFilme = valorFilme * 0.5; break;
 			
-			case 4 : valorFilme = valorFilme * 0.25;
+			case 4 : valorFilme = valorFilme * 0.25; break ;
 			
-			case 5 : valorFilme = 0.0;
+			case 5 : valorFilme = 0d; break;
 			
 			}			
 			valorTotal += valorFilme;
