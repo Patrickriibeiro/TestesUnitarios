@@ -1,5 +1,7 @@
 package br.ce.wcaquino.servicos;
 
+import static br.ce.wcaquino.builders.UsuarioBuilder.umUsuario;
+import static br.ce.wcaquino.builders.FilmeBuilder.*;
 import static br.ce.wcaquino.matchers.MatchersProprios.caiNumaSegunda;
 import static br.ce.wcaquino.matchers.MatchersProprios.ehHoje;
 import static br.ce.wcaquino.matchers.MatchersProprios.ehHojeComDiferencaDias;
@@ -29,6 +31,7 @@ import br.ce.wcaquino.entidades.Usuario;
 import br.ce.wcaquino.exception.FilmeSemEstoqueException;
 import br.ce.wcaquino.exception.LocadoraException;
 import br.ce.wcaquino.utils.DataUtils;
+import buildermaster.BuilderMaster;
 
 public class LocacaoServiceTeste {
 
@@ -71,8 +74,8 @@ public class LocacaoServiceTeste {
 		Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
 		
 		// Cenario
-		Usuario usuario = new Usuario("Patrick");
-		List<Filme> filmes = Arrays.asList(new Filme("Harry Potter", 2, 5.0));
+		Usuario usuario = umUsuario().agora();
+		List<Filme> filmes = Arrays.asList(umFilme().comValor(5.0).agora());
 
 		// Acão
 		Locacao locacao = service.alugarFilme(usuario, filmes);
@@ -101,8 +104,8 @@ public class LocacaoServiceTeste {
 														// excecão esperada.
 	public void naoDeveAlugarFilmeSemEstoque() throws Exception {
 		// Cenario
-		Usuario usuario = new Usuario("Patrick");
-		List<Filme> filmes = Arrays.asList(new Filme("Harry Potter", 0, 5.0));
+		Usuario usuario = umUsuario().agora();
+		List<Filme> filmes = Arrays.asList(umFilmeSemEstoque().agora());
 
 		// Acão
 		service.alugarFilme(usuario, filmes);
@@ -112,7 +115,7 @@ public class LocacaoServiceTeste {
 	@Test
 	public void naoDeveAlugarFilmeSemUsuario() throws FilmeSemEstoqueException {
 		// Usuario usuario = new Usuario("Patrick");
-		List<Filme> filmes = Arrays.asList(new Filme("Harry Potter", 2, 5.0));
+		List<Filme> filmes = Arrays.asList(umFilme().agora());
 
 		// Acão
 		try {
@@ -128,7 +131,7 @@ public class LocacaoServiceTeste {
 	@Test()
 	public void naoDeveAlugarFilmeSemFilme() throws Exception {
 		// Cenario
-		Usuario usuario = new Usuario("Patrick");
+		Usuario usuario = umUsuario().agora();
 		// Filme filme = new Filme("Harry Potter", 0, 5.0);
 
 		exception.expect(LocadoraException.class);
@@ -146,8 +149,8 @@ public class LocacaoServiceTeste {
 		Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
 		
 		//Cenario
-		Usuario usuario = new Usuario("Usuario 1");		
-		List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 2, 4.0)); 
+		Usuario usuario = umUsuario().agora();		
+		List<Filme> filmes = Arrays.asList(umFilme().agora()); 
 		
 		// acao
 		Locacao resultado = service.alugarFilme(usuario, filmes);
@@ -161,6 +164,10 @@ public class LocacaoServiceTeste {
 		//assertTrue(ehSegunda);
 		// assertThat(retorno.getDataRetorno(),caiEm(Calendar.MONDAY));
 		// assertThat(retorno.getDataRetorno(),caiNumaSegunda());
+	}
+	
+	public static void main(String[] args) {
+		new BuilderMaster().gerarCodigoClasse(Locacao.class);
 	}
 	
 }
