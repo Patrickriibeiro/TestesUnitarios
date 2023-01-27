@@ -2,6 +2,7 @@ package br.ce.wcaquino.servicos;
 
 import static br.ce.wcaquino.builders.FilmeBuilder.umFilme;
 import static br.ce.wcaquino.builders.FilmeBuilder.umFilmeSemEstoque;
+import static br.ce.wcaquino.builders.LocacaoBuilder.umLocacao;
 import static br.ce.wcaquino.builders.UsuarioBuilder.umUsuario;
 import static br.ce.wcaquino.matchers.MatchersProprios.caiNumaSegunda;
 import static br.ce.wcaquino.matchers.MatchersProprios.ehHoje;
@@ -10,7 +11,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -19,6 +22,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -26,7 +30,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mockito.*;
 
 import br.ce.wcaquino.dao.LocacaoDAO;
 import br.ce.wcaquino.entidades.Filme;
@@ -44,6 +47,8 @@ public class LocacaoServiceTeste {
 	
 	private SPCService spcService;
 	
+	private EmailService emailService;
+	
 	@Rule
 	public ErrorCollector error = new ErrorCollector(); // Coletar todas as falhas somente e um tempo de execução no
 														// mesmo metodo teste;
@@ -56,12 +61,16 @@ public class LocacaoServiceTeste {
 		//System.out.println("Before");
 		service = new LocacaoService();
 		
+		//Mockando classes, instacias do objeto.
+		
         dao = mock(LocacaoDAO.class);
         service.setDao(dao);
         
         spcService = mock(SPCService.class);
         service.setSpcService(spcService);
         
+        emailService = mock(EmailService.class);
+        service.setEmailService(emailService);
 	}
 
 	@After
@@ -177,21 +186,46 @@ public class LocacaoServiceTeste {
 	}
 	
 	@Test
-	public void naoDeveAlugarFilmeParaNegativadoSPC() throws LocadoraException, FilmeSemEstoqueException {
+	public void naoDeveAlugarFilmeParaNegativadoSPC() throws FilmeSemEstoqueException {
+		// cenario
+		Usuario usuario = umUsuario().agora();
+		List<Filme> filmes = Arrays.asList(umFilme().agora());
+
+		// Mokito mokando o resultado do resultado do metodo
+		when(spcService.possuiNegativacao(usuario)).thenReturn(true);
+
+		// acao
+		try {
+			service.alugarFilme(usuario, filmes);
+			// verificacao
+			Assert.fail();//Caso a exceção não seja lançada o fail vai impedir um falso positivo.
+		} catch (LocadoraException e) {
+			assertThat(e.getMessage(), is("Usuário Negativado"));
+		}
+
+		verify(spcService).possuiNegativacao(usuario);
+
+	}
+	
+	@Test
+	public void deveEnviarEmailParaLocacoesAtrasadas() {
 		//cenario
 		Usuario usuario = umUsuario().agora();
-		Usuario usuario2 = umUsuario().comNome("RICARDO").agora();
-		List<Filme> filmes = Arrays.asList(umFilme().agora());
 		
-		when(spcService.possuiNegativacao(usuario)).thenReturn(true);
+		List<Locacao> locacoes = Arrays.asList(
+			umLocacao()
+				.comUsuario(usuario)
+				.comDataRetorno(DataUtils.obterDataComDiferencaDias(-2))
+			.agora());	
 		
-		exception.expect(LocadoraException.class);
-		exception.expectMessage("Usuário Negativado");
-		
+		when(dao.obterLocacoesPedentes()).thenReturn(locacoes); //Mokito mokando retorno Locacoes.
 		
 		//acao
-		service.alugarFilme(usuario2, filmes);
-				
+		service.notificarAtrasos();
+		
+		//Verificacao
+		verify(emailService).notificarAtraso(usuario);
+		
 	}
 	
 }

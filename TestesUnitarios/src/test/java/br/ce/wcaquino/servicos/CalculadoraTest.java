@@ -60,14 +60,14 @@ public class CalculadoraTest {
 	@Test(expected = NaoPodeDividirPorZeroException.class)
 	public void deveLancarExcecaoAoDividirPorZero() throws NaoPodeDividirPorZeroException {
 		// Cenario
-		int a = 10;
+		int a = 0;
 		int b = 0;
 	
 		// Ação
 		int resultado = calc.dividir(a, b);
 
 		// verificação
-		Assert.assertEquals(2, resultado);
+		Assert.assertEquals(5, resultado);
 
 	}
 	

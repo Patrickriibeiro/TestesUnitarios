@@ -18,6 +18,7 @@ public class LocacaoService {
 
 	private LocacaoDAO dao;
 	private SPCService spcService;
+	private EmailService emailService;
 
 	Double valorTotal = 0d;
 
@@ -85,6 +86,13 @@ public class LocacaoService {
 
 		return locacao;
 	}
+	
+	public void notificarAtrasos() {
+		List<Locacao> locacoes = dao.obterLocacoesPedentes();
+		for(Locacao locacao: locacoes) {
+			emailService.notificarAtraso(locacao.getUsuario());
+		}
+	}
 
 	public void setDao(LocacaoDAO dao) {
 		this.dao = dao;
@@ -92,5 +100,9 @@ public class LocacaoService {
 	
 	public void setSpcService(SPCService scpService) {
 		this.spcService = scpService;
+	}
+
+	public void setEmailService(EmailService emailService) {
+		this.emailService = emailService;
 	}
 }

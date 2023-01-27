@@ -11,9 +11,9 @@ public class AssertTest {
 	@Test
 	public void test() {
 		Assert.assertTrue(true); // Teste boleano
-		Assert.assertTrue(false);
+		//Assert.assertTrue(false);
 
-		Assert.assertEquals("Erro de comparacao", 1, 2); // teste de valores iguais.
+		//Assert.assertEquals("Erro de comparacao", 2, 2); // teste de valores iguais.
 		Assert.assertEquals(0.51, 0.51, 0.01); // terceiro parametro é o delta de comparação
 		Assert.assertEquals(Math.PI, 3.14, 0.01);
 

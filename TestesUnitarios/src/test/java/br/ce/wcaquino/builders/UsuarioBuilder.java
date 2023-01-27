@@ -11,7 +11,7 @@ public class UsuarioBuilder {
 	public static UsuarioBuilder umUsuario() {
 		UsuarioBuilder builder = new UsuarioBuilder();
 		builder.usuario = new Usuario();
-		builder.usuario.setNome("Usuario 1");
+		builder.usuario.setNome("Patrick");
 		return builder;
 	}
 	
