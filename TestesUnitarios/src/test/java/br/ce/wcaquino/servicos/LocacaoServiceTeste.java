@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -35,6 +34,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import br.ce.wcaquino.dao.LocacaoDAO;
 import br.ce.wcaquino.entidades.Filme;
@@ -46,12 +48,16 @@ import br.ce.wcaquino.utils.DataUtils;
 
 public class LocacaoServiceTeste {
 
+	@InjectMocks
     private LocacaoService service;
     
+    @Mock
     private LocacaoDAO dao;
 	
+    @Mock
 	private SPCService spcService;
 	
+    @Mock
 	private EmailService emailService;
 	
 	@Rule
@@ -64,18 +70,7 @@ public class LocacaoServiceTeste {
 	@Before
 	public void setup() {
 		//System.out.println("Before");
-		service = new LocacaoService();
-		
-		//Mockando classes, instacias do objeto.
-		
-        dao = mock(LocacaoDAO.class);
-        service.setDao(dao);
-        
-        spcService = mock(SPCService.class);
-        service.setSpcService(spcService);
-        
-        emailService = mock(EmailService.class);
-        service.setEmailService(emailService);
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@After
